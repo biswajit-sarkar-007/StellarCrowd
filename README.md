@@ -1,19 +1,41 @@
-# React + Vite
+# StellarCrowd
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A decentralized Stellar crowdfunding application built on the Stellar Testnet. This project fully implements the Level 2 criteria for the Stellar Developer Challenge, featuring multi-wallet integration, smart contract interaction (read and write), real-time event streaming, and comprehensive transaction status and error handling.
 
-Currently, two official plugins are available:
+## Features (Level 2 Requirements Met)
+- **Multi-Wallet Integration**: Built using `StellarWalletsKit` allowing connections from wallets like Freighter.
+- **Smart Contract Integrated**: Deployed a crowdfunding contract to the Stellar Testnet.
+- **Contract Calls (Frontend)**: Real-time read operations (`get_total_raised`, `get_donor_count`) and write operations (`donate`).
+- **Real-time Event Handling**: Live Activity Feed utilizing event streaming for donation events.
+- **Detailed Error Handling**: Properly catches and displays messages for missing wallets, user-rejected transactions, and insufficient balances.
+- **Transaction Statuses**: Visually tracks transaction state changes (Preparing, Waiting for Approval, Submitting, Confirming) in the UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup Instructions
 
-## React Compiler
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/biswajit-sarkar-007/StellarCrowd.git
+   cd StellarCrowd
+   ```
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   Navigate to the localhost URL provided in your terminal.
 
-## Expanding the ESLint configuration
+## Submission Details
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Deployed Contract Address**: `CA5IN4DYYCOTUYIXFEP7675RNN2CIFYSH4CAZHQ23KUKMGB65BJFYNVN`
+- **Wallet Options Screenshot**: `![Wallet Options](./public/screenshot.png)`
+- **Transaction Hash of Contract Call**: `66abe4b9dc0792d4c041af4009af32b7962e230c9ad4d4801ab2de04251a2f03`
+
+## Testing Error States
+- **Wallet Unavailable**: Ensure no wallet extensions are unlocked/installed and attempt connection.
+- **User Rejects**: Attempt a donation, but reject the signature request in your wallet.
+- **Insufficient Balance**: Attempt to donate an amount larger than your Testnet XLM balance.

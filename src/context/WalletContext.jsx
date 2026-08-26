@@ -48,6 +48,11 @@ export function WalletProvider({ children }) {
     const [transactionStep, setTransactionStep] =
         useState("");
 
+    // Increments every time a donation succeeds,
+    // so CampaignStats can re-fetch immediately.
+    const [donationCount, setDonationCount] =
+        useState(0);
+
     const connectWallet = useCallback(async () => {
         setError("");
         setIsConnecting(true);
@@ -139,26 +144,19 @@ export function WalletProvider({ children }) {
                 setBalance(xlmBalance);
             } catch (error) {
                 console.error(
-                    "Donation failed:",
+                    "Refresh balance failed:",
                     error
                 );
 
                 const parsedError =
                     getStellarErrorMessage(error);
 
-                setTransactionStatus(
-                    "failed"
+                setError(
+                    parsedError.message || "Failed to refresh balance"
                 );
 
-                setTransactionStep(
-                    "Transaction failed."
-                );
-
-                setTransactionError(
-                    parsedError.message
-                );
-
-                throw error;
+            } finally {
+                setIsLoadingBalance(false);
             }
         },
         [walletAddress]
@@ -298,6 +296,9 @@ export function WalletProvider({ children }) {
 
                     await refreshBalance();
 
+                    // Signal CampaignStats to refresh
+                    setDonationCount((c) => c + 1);
+
                     return {
                         success: true,
                         hash,
@@ -382,7 +383,9 @@ export function WalletProvider({ children }) {
         transactionStatus,
         transactionHash,
         transactionError,
-        transactionStep
+        transactionStep,
+
+        donationCount,
     };
 
     return (

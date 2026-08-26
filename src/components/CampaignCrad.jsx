@@ -1,48 +1,142 @@
-function CampaignCard() {
+import { useEffect, useState, useCallback } from "react";
+
+import { stellarService } from "../services/steller";
+import { useWallet } from "../context/WalletContext";
+
+
+function CampaignStats() {
+    const { donationCount } = useWallet();
+
+    const [totalRaised, setTotalRaised] =
+        useState(null);
+
+    const [donorCount, setDonorCount] =
+        useState(null);
+
+    const [isLoading, setIsLoading] =
+        useState(true);
+
+    const [error, setError] =
+        useState("");
+
+
+    const loadStats = useCallback(async () => {
+        try {
+            setError("");
+
+            const [
+                total,
+                donors,
+            ] = await Promise.all([
+                stellarService.getTotalRaised(),
+                stellarService.getDonorCount(),
+            ]);
+
+            const totalNum = Number(total);
+            const donorsNum = Number(donors);
+
+            setTotalRaised(
+                isNaN(totalNum) ? 0 : totalNum / 10_000_000
+            );
+
+            setDonorCount(
+                isNaN(donorsNum) ? 0 : donorsNum
+            );
+
+        } catch (err) {
+
+            console.error(
+                "Campaign stats error:",
+                err
+            );
+
+            setError(
+                "Unable to load campaign statistics."
+            );
+
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+
+    // Refresh whenever page loads or a donation completes
+    useEffect(() => {
+        loadStats();
+    }, [loadStats, donationCount]);
+
+    // Also poll every 10 seconds
+    useEffect(() => {
+        const interval = setInterval(loadStats, 10_000);
+        return () => clearInterval(interval);
+    }, [loadStats]);
+
+
     return (
-        <section className="campaign-card">
-            <p className="campaign-label">
-                COMMUNITY FUND
-            </p>
+        <section className="campaign-stats">
 
-            <h2>
-                Help Build Our Community Lab
-            </h2>
+            <div className="stats-header">
 
-            <p className="campaign-description">
-                Support our community project by
-                contributing XLM on Stellar Testnet.
-            </p>
+                <span>
+                    CAMPAIGN STATS
+                </span>
 
-            <div className="campaign-stats">
-                <div>
-                    <span>Goal</span>
-                    <strong>100 XLM</strong>
-                </div>
+                <span className="stats-live">
+                    ● LIVE
+                </span>
 
-                <div>
-                    <span>Raised</span>
-                    <strong>0 XLM</strong>
-                </div>
-
-                <div>
-                    <span>Donors</span>
-                    <strong>0</strong>
-                </div>
             </div>
 
-            <div className="progress-container">
-                <div className="progress-bar">
-                    <div
-                        className="progress-fill"
-                        style={{ width: "0%" }}
-                    />
-                </div>
 
-                <span>0%</span>
-            </div>
+            {isLoading ? (
+                <div className="stats-grid">
+                    <div className="stat-item">
+                        <span>Total Raised</span>
+                        <strong className="stat-loading">—</strong>
+                    </div>
+                    <div className="stat-item">
+                        <span>Donors</span>
+                        <strong className="stat-loading">—</strong>
+                    </div>
+                </div>
+            ) : error ? (
+                <p className="stats-error">
+                    {error}
+                </p>
+            ) : (
+                <div className="stats-grid">
+
+                    <div className="stat-item">
+
+                        <span>
+                            Total Raised
+                        </span>
+
+                        <strong>
+                            {totalRaised} XLM
+                        </strong>
+
+                    </div>
+
+
+                    <div className="stat-item">
+
+                        <span>
+                            Donors
+                        </span>
+
+                        <strong>
+                            {donorCount}
+                        </strong>
+
+                    </div>
+
+                </div>
+            )}
+
         </section>
     );
 }
 
-export default CampaignCard;
+
+export default CampaignStats;

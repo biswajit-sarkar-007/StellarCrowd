@@ -1,10 +1,8 @@
 import Navbar from "./components/Navbar";
 import WalletBalance from "./components/WalletBalance";
-import CampaignCard from "./components/CampaignCrad";
+import CampaignStats from "./components/CampaignCrad";
 import DonateForm from "./components/DonateForm";
-import TransactionStatus from "./components/TransactionStatus";
 import ActivityFeed from "./components/ActivityFeed";
-import ContractStats from "./components/ContractStats";
 
 import { useWallet } from "./context/WalletContext";
 
@@ -18,37 +16,26 @@ function App() {
       <Navbar />
 
       <main className="main-content">
-
         <section className="hero">
           <p className="hero-label">
             STELLAR TESTNET
           </p>
 
           <h1>
-            Fund the future,
-            <br />
-            one XLM at a time.
+            Support Something Meaningful
           </h1>
 
           <p className="hero-description">
-            A real-time crowdfunding application
-            powered by Stellar smart contracts.
+            Decentralized Stellar Crowdfunding
           </p>
         </section>
 
-        <WalletBalance />
-
         <section className="dashboard">
-          <CampaignCard />
+          <CampaignStats />
+          <WalletBalance />
         </section>
 
-        <ContractStats
-          walletAddress={walletAddress}
-        />
-
         <DonateForm />
-
-        <TransactionStatus />
 
         <ActivityFeed />
 
