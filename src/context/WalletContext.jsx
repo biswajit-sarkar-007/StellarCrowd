@@ -48,6 +48,8 @@ export function WalletProvider({ children }) {
 
     const [transactionError, setTransactionError] =
         useState("");
+    const [transactionStep, setTransactionStep] =
+        useState("");
 
     const connectWallet = useCallback(async () => {
         setError("");
@@ -168,29 +170,60 @@ export function WalletProvider({ children }) {
             }
 
             setTransactionStatus("pending");
+            setTransactionStep(
+                "Preparing transaction..."
+            );
+
             setTransactionHash("");
             setTransactionError("");
 
             try {
-                // 1. Build and simulate
+                /*
+                 * STEP 1
+                 * Build and simulate Soroban transaction
+                 */
+                setTransactionStep(
+                    "Preparing transaction..."
+                );
+
                 const transaction =
                     await prepareDonation(
                         walletAddress,
                         amount
                     );
 
-                // 2. Convert transaction to XDR
+
+                /*
+                 * STEP 2
+                 * Convert transaction to XDR
+                 */
+                setTransactionStep(
+                    "Waiting for wallet approval..."
+                );
+
                 const xdr =
                     transaction.toXDR();
 
-                // 3. Ask wallet to sign
+
+                /*
+                 * STEP 3
+                 * Ask connected wallet to sign
+                 */
                 const signed =
                     await walletService.signTransaction(
                         xdr,
                         walletAddress
                     );
 
-                // 4. Submit signed transaction
+
+                /*
+                 * STEP 4
+                 * Submit signed transaction
+                 */
+                setTransactionStep(
+                    "Submitting transaction..."
+                );
+
                 const submitted =
                     await submitSignedTransaction(
                         signed.signedTxXdr
@@ -201,8 +234,16 @@ export function WalletProvider({ children }) {
 
                 setTransactionHash(hash);
 
-                // 5. Wait for transaction result
-                let result;
+
+                /*
+                 * STEP 5
+                 * Wait for Stellar confirmation
+                 */
+                setTransactionStep(
+                    "Waiting for confirmation..."
+                );
+
+                let result = null;
 
                 for (
                     let attempt = 0;
@@ -232,12 +273,20 @@ export function WalletProvider({ children }) {
                     }
                 }
 
+
+                /*
+                 * SUCCESS
+                 */
                 if (
                     result?.status ===
                     "SUCCESS"
                 ) {
                     setTransactionStatus(
                         "success"
+                    );
+
+                    setTransactionStep(
+                        "Transaction confirmed successfully."
                     );
 
                     await refreshBalance();
@@ -248,8 +297,16 @@ export function WalletProvider({ children }) {
                     };
                 }
 
+
+                /*
+                 * FAILED / TIMEOUT
+                 */
                 setTransactionStatus(
                     "failed"
+                );
+
+                setTransactionStep(
+                    "Transaction failed."
                 );
 
                 setTransactionError(
@@ -260,17 +317,25 @@ export function WalletProvider({ children }) {
                     success: false,
                     hash,
                 };
+
             } catch (error) {
+
                 console.error(
                     "Donation failed:",
                     error
                 );
 
                 const parsedError =
-                    getStellarErrorMessage(error);
+                    getStellarErrorMessage(
+                        error
+                    );
 
                 setTransactionStatus(
                     "failed"
+                );
+
+                setTransactionStep(
+                    "Transaction failed."
                 );
 
                 setTransactionError(
@@ -285,7 +350,6 @@ export function WalletProvider({ children }) {
             refreshBalance,
         ]
     );
-
     const value = {
         walletAddress,
         walletId,
@@ -311,6 +375,7 @@ export function WalletProvider({ children }) {
         transactionStatus,
         transactionHash,
         transactionError,
+        transactionStep
     };
 
     return (

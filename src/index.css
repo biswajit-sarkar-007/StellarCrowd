@@ -1090,3 +1090,99 @@ button {
     padding: 12px;
   }
 }
+
+.transaction-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  margin-top: 18px;
+  padding: 15px;
+
+  border-radius: 14px;
+
+  border: 1px solid #e2e8f0;
+}
+
+.transaction-status strong {
+  display: block;
+
+  font-size: 14px;
+}
+
+.transaction-status p {
+  margin: 5px 0 0;
+
+  font-size: 12px;
+  color: #64748b;
+}
+
+.transaction-status a {
+  display: inline-block;
+
+  margin-top: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.transaction-status.pending {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.transaction-status.success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.transaction-status.failed {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.transaction-spinner {
+  width: 22px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  border: 2px solid #e5e7eb;
+  border-top-color: #f59e0b;
+
+  border-radius: 50%;
+
+  animation: transactionSpin 0.8s linear infinite;
+}
+
+.transaction-success-icon,
+.transaction-error-icon {
+  width: 25px;
+  height: 25px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: white;
+  font-weight: 700;
+}
+
+.transaction-success-icon {
+  background: #16a34a;
+}
+
+.transaction-error-icon {
+  background: #dc2626;
+}
+
+@keyframes transactionSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -9,6 +9,7 @@ function DonationForm() {
         transactionStatus,
         transactionHash,
         transactionError,
+        transactionStep,
     } = useWallet();
 
     const [amount, setAmount] = useState("");
@@ -324,6 +325,78 @@ function DonationForm() {
                     🔒 Secured by Stellar Testnet
                 </p>
             </form>
+            {transactionStatus !== "idle" && (
+                <div
+                    className={`transaction-status ${transactionStatus}`}
+                >
+
+                    {transactionStatus === "pending" && (
+                        <>
+                            <div className="transaction-spinner" />
+
+                            <div>
+                                <strong>
+                                    Transaction in progress
+                                </strong>
+
+                                <p>
+                                    {transactionStep}
+                                </p>
+                            </div>
+                        </>
+                    )}
+
+
+                    {transactionStatus === "success" && (
+                        <>
+                            <div className="transaction-success-icon">
+                                ✓
+                            </div>
+
+                            <div>
+                                <strong>
+                                    Donation successful
+                                </strong>
+
+                                <p>
+                                    {transactionStep}
+                                </p>
+
+                                {transactionHash && (
+                                    <a
+                                        href={`https://stellar.expert/explorer/testnet/tx/${transactionHash}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        View transaction ↗
+                                    </a>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+
+                    {transactionStatus === "failed" && (
+                        <>
+                            <div className="transaction-error-icon">
+                                !
+                            </div>
+
+                            <div>
+                                <strong>
+                                    Donation failed
+                                </strong>
+
+                                <p>
+                                    {transactionError ||
+                                        transactionStep}
+                                </p>
+                            </div>
+                        </>
+                    )}
+
+                </div>
+            )}
 
             {/* Success */}
             {transactionStatus ===
