@@ -32,7 +32,7 @@ A decentralized Stellar crowdfunding application built on the Stellar Testnet. T
 ## Submission Details
 
 - **Deployed Contract Address**: `CA5IN4DYYCOTUYIXFEP7675RNN2CIFYSH4CAZHQ23KUKMGB65BJFYNVN`
-- **Wallet Options Screenshot**: `![Wallet Options](./public/screenshot.png)`
+- **Wallet Options Screenshot**: ![Wallet Options](./public/screenshot.png)
 - **Transaction Hash of Contract Call**: `66abe4b9dc0792d4c041af4009af32b7962e230c9ad4d4801ab2de04251a2f03`
 
 ## Testing Error States
