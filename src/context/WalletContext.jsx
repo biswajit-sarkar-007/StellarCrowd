@@ -5,14 +5,11 @@ import {
     useState,
 } from "react";
 import {
+    getStellarErrorMessage,
     prepareDonation,
     submitSignedTransaction,
     getTransactionStatus,
 } from "../services/donation";
-
-import {
-    getStellarErrorMessage,
-} from "../services/stellarErrors";
 
 import { walletService } from "../services/wallet";
 import { stellarService } from "../services/steller";
@@ -142,16 +139,26 @@ export function WalletProvider({ children }) {
                 setBalance(xlmBalance);
             } catch (error) {
                 console.error(
-                    "Balance refresh failed:",
+                    "Donation failed:",
                     error
                 );
 
-                setError(
-                    error?.message ||
-                    "Unable to refresh balance."
+                const parsedError =
+                    getStellarErrorMessage(error);
+
+                setTransactionStatus(
+                    "failed"
                 );
-            } finally {
-                setIsLoadingBalance(false);
+
+                setTransactionStep(
+                    "Transaction failed."
+                );
+
+                setTransactionError(
+                    parsedError.message
+                );
+
+                throw error;
             }
         },
         [walletAddress]
