@@ -2,20 +2,39 @@
 
 use soroban_sdk::{
     contract,
+    contractevent,
     contractimpl,
+    token,
     Address,
     Env,
     Symbol,
 };
+
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct DonationEvent {
+    #[topic]
+    pub donor: Address,
+    pub amount: i128,
+}
 
 #[contract]
 pub struct StellarCrowd;
 
 #[contractimpl]
 impl StellarCrowd {
-    pub fn initialize(env: Env) {
-        let total_raised_key = Symbol::new(&env, "total_raised");
-        let donor_count_key = Symbol::new(&env, "donor_count");
+    pub fn initialize(
+        env: Env,
+        token_address: Address,
+    ) {
+        let total_raised_key =
+            Symbol::new(&env, "total_raised");
+
+        let donor_count_key =
+            Symbol::new(&env, "donor_count");
+
+        let token_key =
+            Symbol::new(&env, "token");
 
         if !env.storage().instance().has(&total_raised_key) {
             env.storage()
@@ -28,14 +47,48 @@ impl StellarCrowd {
                 .instance()
                 .set(&donor_count_key, &0u32);
         }
+
+        if !env.storage().instance().has(&token_key) {
+            env.storage()
+                .instance()
+                .set(&token_key, &token_address);
+        }
     }
 
-    pub fn donate(env: Env, donor: Address, amount: i128) {
+    pub fn donate(
+        env: Env,
+        donor: Address,
+        amount: i128,
+    ) {
         donor.require_auth();
 
         if amount <= 0 {
             panic!("Donation amount must be greater than zero");
         }
+
+        let token_key =
+            Symbol::new(&env, "token");
+
+        let token_address: Address = env
+            .storage()
+            .instance()
+            .get(&token_key)
+            .unwrap();
+
+        let token_client =
+            token::Client::new(
+                &env,
+                &token_address,
+            );
+
+        let contract_address =
+            env.current_contract_address();
+
+        token_client.transfer(
+            &donor,
+            &contract_address,
+            &amount,
+        );
 
         let total_raised_key =
             Symbol::new(&env, "total_raised");
@@ -55,11 +108,15 @@ impl StellarCrowd {
             .get(&donor_count_key)
             .unwrap_or(0);
 
-        let new_total = current_total + amount;
+        let new_total =
+            current_total + amount;
 
         env.storage()
             .instance()
-            .set(&total_raised_key, &new_total);
+            .set(
+                &total_raised_key,
+                &new_total,
+            );
 
         env.storage()
             .instance()
@@ -68,13 +125,16 @@ impl StellarCrowd {
                 &(current_donor_count + 1),
             );
 
-        env.events().publish(
-            (Symbol::new(&env, "donation"), donor),
+        DonationEvent {
+            donor,
             amount,
-        );
+        }
+        .publish(&env);
     }
 
-    pub fn get_total_raised(env: Env) -> i128 {
+    pub fn get_total_raised(
+        env: Env,
+    ) -> i128 {
         let key =
             Symbol::new(&env, "total_raised");
 
@@ -84,7 +144,9 @@ impl StellarCrowd {
             .unwrap_or(0)
     }
 
-    pub fn get_donor_count(env: Env) -> u32 {
+    pub fn get_donor_count(
+        env: Env,
+    ) -> u32 {
         let key =
             Symbol::new(&env, "donor_count");
 
@@ -93,13 +155,27 @@ impl StellarCrowd {
             .get(&key)
             .unwrap_or(0)
     }
+
+    pub fn get_token(
+        env: Env,
+    ) -> Address {
+        let key =
+            Symbol::new(&env, "token");
+
+        env.storage()
+            .instance()
+            .get(&key)
+            .unwrap()
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+
     use soroban_sdk::{
         testutils::Address as _,
+        token,
         Address,
         Env,
     };
@@ -108,16 +184,25 @@ mod test {
     fn test_initialize() {
         let env = Env::default();
 
-        let contract_id =
-            env.register(StellarCrowd, ());
+        let admin = Address::generate(&env);
 
-        let client =
-            StellarCrowdClient::new(
-                &env,
-                &contract_id,
-            );
+        let token_address = env
+            .register_stellar_asset_contract_v2(admin.clone())
+            .address();
 
-        client.initialize();
+        let contract_id = env.register(
+            StellarCrowd,
+            (),
+        );
+
+        let client = StellarCrowdClient::new(
+            &env,
+            &contract_id,
+        );
+
+        client.initialize(
+            &token_address,
+        );
 
         assert_eq!(
             client.get_total_raised(),
@@ -128,33 +213,71 @@ mod test {
             client.get_donor_count(),
             0
         );
+
+        assert_eq!(
+            client.get_token(),
+            token_address
+        );
     }
 
     #[test]
     fn test_donation() {
         let env = Env::default();
 
-        let contract_id =
-            env.register(StellarCrowd, ());
+        let admin = Address::generate(&env);
 
-        let client =
-            StellarCrowdClient::new(
+        let token_address = env
+            .register_stellar_asset_contract_v2(admin.clone())
+            .address();
+
+        let token_client =
+            token::StellarAssetClient::new(
                 &env,
-                &contract_id,
+                &token_address,
             );
 
-        client.initialize();
+        let contract_id = env.register(
+            StellarCrowd,
+            (),
+        );
+
+        let client = StellarCrowdClient::new(
+            &env,
+            &contract_id,
+        );
+
+        client.initialize(
+            &token_address,
+        );
 
         let donor =
             Address::generate(&env);
 
         env.mock_all_auths();
 
+        // Give the donor 1000 test tokens.
+        token_client.mint(
+            &donor,
+            &1000,
+        );
+
+        // Verify donor initially has 1000.
+        assert_eq!(
+            token::Client::new(
+                &env,
+                &token_address,
+            )
+            .balance(&donor),
+            1000
+        );
+
+        // Donate 100.
         client.donate(
             &donor,
             &100,
         );
 
+        // Verify accounting.
         assert_eq!(
             client.get_total_raised(),
             100
@@ -164,6 +287,26 @@ mod test {
             client.get_donor_count(),
             1
         );
+
+        // Verify donor lost 100.
+        assert_eq!(
+            token::Client::new(
+                &env,
+                &token_address,
+            )
+            .balance(&donor),
+            900
+        );
+
+        // Verify contract received 100.
+        assert_eq!(
+            token::Client::new(
+                &env,
+                &token_address,
+            )
+            .balance(&contract_id),
+            100
+        );
     }
 
     #[test]
@@ -171,16 +314,26 @@ mod test {
     fn test_zero_donation_fails() {
         let env = Env::default();
 
-        let contract_id =
-            env.register(StellarCrowd, ());
+        let admin =
+            Address::generate(&env);
 
-        let client =
-            StellarCrowdClient::new(
-                &env,
-                &contract_id,
-            );
+        let token_address = env
+            .register_stellar_asset_contract_v2(admin.clone())
+            .address();
 
-        client.initialize();
+        let contract_id = env.register(
+            StellarCrowd,
+            (),
+        );
+
+        let client = StellarCrowdClient::new(
+            &env,
+            &contract_id,
+        );
+
+        client.initialize(
+            &token_address,
+        );
 
         let donor =
             Address::generate(&env);
