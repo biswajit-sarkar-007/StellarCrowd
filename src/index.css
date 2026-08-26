@@ -315,3 +315,49 @@ button {
   color: #b42318;
   font-size: 12px;
 }
+
+.balance-card {
+  margin-bottom: 24px;
+  padding: 24px 30px;
+  background: white;
+  border: 1px solid #e8ebf0;
+  border-radius: 18px;
+}
+
+.balance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.balance-label {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #667085;
+}
+
+.balance-value {
+  font-size: 32px;
+}
+
+.refresh-button {
+  padding: 10px 16px;
+  border: 1px solid #d9dee7;
+  border-radius: 10px;
+  background: white;
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .balance-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

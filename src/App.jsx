@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import WalletBalance from "./components/WalletBalance";
 import CampaignCard from "./components/CampaignCrad";
 import DonateForm from "./components/DonateForm";
 import TransactionStatus from "./components/TransactionStatus";
@@ -26,6 +27,8 @@ function App() {
             powered by Stellar smart contracts.
           </p>
         </section>
+
+        <WalletBalance />
 
         <section className="dashboard">
           <CampaignCard />
