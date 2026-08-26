@@ -24,12 +24,54 @@ function formatAmount(amount) {
 }
 
 
+function formatTime(timestamp) {
+    if (!timestamp) {
+        return "Just now";
+    }
+
+    const date =
+        new Date(timestamp * 1000);
+
+    const seconds =
+        Math.floor(
+            (Date.now() - date.getTime()) /
+            1000
+        );
+
+    if (seconds < 60) {
+        return "Just now";
+    }
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    if (minutes < 60) {
+        return `${minutes}m ago`;
+    }
+
+    const hours =
+        Math.floor(minutes / 60);
+
+    if (hours < 24) {
+        return `${hours}h ago`;
+    }
+
+    const days =
+        Math.floor(hours / 24);
+
+    return `${days}d ago`;
+}
+
+
 function ActivityFeed() {
     const [events, setEvents] =
         useState([]);
 
     const [isLoading, setIsLoading] =
         useState(true);
+
+    const [isRefreshing, setIsRefreshing] =
+        useState(false);
 
     const [error, setError] =
         useState("");
@@ -39,32 +81,26 @@ function ActivityFeed() {
 
 
     const loadEvents = useCallback(
-        async () => {
+        async (manual = false) => {
             try {
                 setError("");
+
+                if (manual) {
+                    setIsRefreshing(true);
+                }
 
                 let startLedger =
                     lastLedger;
 
-                /*
-                 * First request:
-                 * Start from the latest ledger.
-                 */
                 if (!startLedger) {
                     startLedger =
                         await getLatestLedger();
                 }
 
-
-                /*
-                 * Fetch donation events
-                 * from our contract.
-                 */
                 const newEvents =
                     await getDonationEvents(
                         startLedger
                     );
-
 
                 if (
                     newEvents.length > 0
@@ -76,10 +112,6 @@ function ActivityFeed() {
                                 ...previous,
                             ];
 
-
-                            /*
-                             * Remove duplicate events.
-                             */
                             const unique =
                                 Array.from(
                                     new Map(
@@ -92,7 +124,6 @@ function ActivityFeed() {
                                     ).values()
                                 );
 
-
                             return unique.slice(
                                 0,
                                 20
@@ -100,10 +131,6 @@ function ActivityFeed() {
                         }
                     );
 
-
-                    /*
-                     * Remember latest ledger.
-                     */
                     const latest =
                         Math.max(
                             ...newEvents.map(
@@ -113,7 +140,6 @@ function ActivityFeed() {
                                     )
                             )
                         );
-
 
                     setLastLedger(
                         latest
@@ -134,105 +160,157 @@ function ActivityFeed() {
             } finally {
 
                 setIsLoading(false);
+                setIsRefreshing(false);
             }
         },
         [lastLedger]
     );
 
 
-    /*
-     * Load events when component mounts
-     * and every 5 seconds afterwards.
-     */
     useEffect(() => {
-
         loadEvents();
 
         const interval =
             setInterval(
-                loadEvents,
+                () => loadEvents(),
                 5000
             );
-
 
         return () => {
             clearInterval(interval);
         };
-
     }, [loadEvents]);
 
 
     return (
         <section className="activity-card">
 
+            {/* Header */}
+
             <div className="activity-header">
 
                 <div>
 
-                    <span className="activity-eyebrow">
-                        LIVE ACTIVITY
-                    </span>
+                    <div className="activity-title-row">
+
+                        <span className="activity-eyebrow">
+                            LIVE ACTIVITY
+                        </span>
+
+                        <span className="live-indicator">
+                            <span />
+                            LIVE
+                        </span>
+
+                    </div>
 
                     <h2>
                         Recent Donations
                     </h2>
 
                     <p>
-                        Donations are synchronized
-                        from the Stellar contract.
+                        Live donation events from
+                        the Stellar smart contract.
                     </p>
 
                 </div>
 
 
-                <span className="live-indicator">
-
-                    <span />
-
-                    LIVE
-
-                </span>
+                <button
+                    className="activity-refresh"
+                    onClick={() =>
+                        loadEvents(true)
+                    }
+                    disabled={isRefreshing}
+                    title="Refresh activity"
+                >
+                    {isRefreshing
+                        ? "⟳"
+                        : "↻"}
+                </button>
 
             </div>
 
 
+            {/* Loading */}
+
             {isLoading && (
-                <div className="activity-empty">
-                    Loading donations...
+                <div className="activity-loading">
+
+                    <div className="activity-spinner" />
+
+                    <span>
+                        Loading recent donations...
+                    </span>
+
                 </div>
             )}
 
+
+            {/* Error */}
 
             {error && (
                 <div className="activity-error">
-                    ❌ {error}
+
+                    <span>!</span>
+
+                    <div>
+                        <strong>
+                            Unable to load activity
+                        </strong>
+
+                        <p>
+                            {error}
+                        </p>
+                    </div>
+
                 </div>
             )}
 
+
+            {/* Empty */}
 
             {!isLoading &&
                 !error &&
                 events.length === 0 && (
 
                     <div className="activity-empty">
-                        No donations yet.
-                    </div>
 
+                        <div className="empty-icon">
+                            ✦
+                        </div>
+
+                        <strong>
+                            No donations yet
+                        </strong>
+
+                        <p>
+                            Be the first person to
+                            support this campaign.
+                        </p>
+
+                    </div>
                 )}
 
 
-            <div className="activity-list">
+            {/* Events */}
 
-                {events.map((event) => (
+            {!error &&
+                events.length > 0 && (
 
-                    <DonationEventItem
-                        key={event.id}
-                        event={event}
-                    />
+                    <div className="activity-list">
 
-                ))}
+                        {events.map(
+                            (event) => (
+                                <DonationEventItem
+                                    key={event.id}
+                                    event={event}
+                                />
+                            )
+                        )}
 
-            </div>
+                    </div>
+                )}
 
         </section>
     );
@@ -242,16 +320,16 @@ function ActivityFeed() {
 function DonationEventItem({
     event,
 }) {
-
     const donor =
         event.decodedTopics?.[0] ||
         "Unknown";
-
 
     const amount =
         event.decodedValue ||
         0;
 
+    const timestamp =
+        event.ledgerClosedAt;
 
     return (
         <article className="activity-item">
@@ -263,35 +341,57 @@ function DonationEventItem({
 
             <div className="activity-content">
 
-                <strong>
-                    New donation
-                </strong>
+                <div className="activity-event-title">
+
+                    <strong>
+                        New donation
+                    </strong>
+
+                    <span>
+                        {formatTime(
+                            timestamp
+                        )}
+                    </span>
+
+                </div>
 
 
                 <p>
 
-                    {formatAddress(donor)}
+                    <span className="donor-address">
+                        {formatAddress(
+                            donor
+                        )}
+                    </span>
 
                     {" donated "}
 
                     <strong>
-
-                        {formatAmount(amount)}
-
-                        {" XLM"}
-
+                        {formatAmount(
+                            amount
+                        )}{" "}
+                        XLM
                     </strong>
 
                 </p>
 
+
+                <span className="activity-ledger">
+                    Ledger #{event.ledger}
+                </span>
+
             </div>
 
 
-            <span className="activity-ledger">
-
-                #{event.ledger}
-
-            </span>
+            <a
+                href={`https://stellar.expert/explorer/testnet/contract/${event.contractId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="activity-link"
+                title="View on Stellar Expert"
+            >
+                ↗
+            </a>
 
         </article>
     );
