@@ -361,3 +361,377 @@ button {
     flex-direction: column;
   }
 }
+
+.donation-card {
+  width: min(100%, 620px);
+  margin: 40px auto;
+  padding: 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow:
+    0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.donation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.donation-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #64748b;
+}
+
+.donation-header h2 {
+  margin: 7px 0;
+  font-size: 28px;
+  color: #0f172a;
+}
+
+.donation-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.donation-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #f1f5f9;
+  font-size: 24px;
+}
+
+.wallet-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px;
+  margin-bottom: 26px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.wallet-info span,
+.wallet-balance span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.wallet-info strong,
+.wallet-balance strong {
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.wallet-balance {
+  text-align: right;
+}
+
+.wallet-warning {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 26px;
+  border-radius: 14px;
+  background: #fff7ed;
+}
+
+.wallet-warning strong {
+  color: #9a3412;
+}
+
+.wallet-warning p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #c2410c;
+}
+
+.donation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.amount-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.amount-header label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.amount-header span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.amount-input-wrapper {
+  position: relative;
+}
+
+.amount-input-wrapper input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 18px 70px 18px 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 15px;
+  outline: none;
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #fff;
+}
+
+.amount-input-wrapper input:focus {
+  border-color: #64748b;
+  box-shadow:
+    0 0 0 3px rgba(100, 116, 139, 0.12);
+}
+
+.amount-input-wrapper span {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  color: #64748b;
+}
+
+.preset-section>span {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.preset {
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  color: #334155;
+  font-weight: 600;
+}
+
+.preset:hover {
+  background: #f8fafc;
+}
+
+.preset.active {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: white;
+}
+
+.donate-button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: #0f172a;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.donate-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.donate-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.network-note {
+  margin: 0;
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.transaction-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.transaction-status strong {
+  display: block;
+  color: #334155;
+  font-size: 14px;
+}
+
+.transaction-status p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.status-spinner,
+.button-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+.status-spinner {
+  font-size: 24px;
+}
+
+.button-spinner {
+  font-size: 18px;
+}
+
+.transaction-error {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 13px;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.transaction-error span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: white;
+  font-weight: 700;
+}
+
+.transaction-error p {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.donation-success {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.success-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #16a34a;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.donation-success h3 {
+  margin: 0 0 4px;
+  color: #166534;
+  font-size: 15px;
+}
+
+.donation-success p {
+  margin: 0;
+  color: #15803d;
+  font-size: 12px;
+}
+
+.explorer-link {
+  margin-left: auto;
+  white-space: nowrap;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.explorer-link span {
+  margin-left: 4px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .donation-card {
+    margin: 20px 12px;
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .donation-header h2 {
+    font-size: 23px;
+  }
+
+  .wallet-info {
+    flex-direction: column;
+  }
+
+  .wallet-balance {
+    text-align: left;
+  }
+
+  .preset-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .donation-success {
+    flex-wrap: wrap;
+  }
+
+  .explorer-link {
+    margin-left: 54px;
+  }
+}

@@ -5,18 +5,20 @@ import DonateForm from "./components/DonateForm";
 import TransactionStatus from "./components/TransactionStatus";
 import ActivityFeed from "./components/ActivityFeed";
 import ContractStats from "./components/ContractStats";
-import { useState } from "react";
 
+import { useWallet } from "./context/WalletContext";
 
 function App() {
-  const [walletAddress, setWalletAddress] =
-    useState("");
+  const {
+    walletAddress,
+  } = useWallet();
 
   return (
     <div className="app">
       <Navbar />
 
       <main className="main-content">
+
         <section className="hero">
           <p className="hero-label">
             STELLAR TESTNET
@@ -38,16 +40,18 @@ function App() {
 
         <section className="dashboard">
           <CampaignCard />
-
-          <DonateForm />
         </section>
+
+        <ContractStats
+          walletAddress={walletAddress}
+        />
+
+        <DonateForm />
 
         <TransactionStatus />
 
         <ActivityFeed />
-        <ContractStats
-          walletAddress={walletAddress}
-        />
+
       </main>
     </div>
   );

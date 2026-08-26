@@ -2,12 +2,16 @@ import {
     Contract,
     TransactionBuilder,
     BASE_FEE,
-    rpc,
 } from "@stellar/stellar-sdk";
+
+import {
+    Server,
+    Api,
+} from "@stellar/stellar-sdk/rpc";
 
 import { STELLAR_CONFIG } from "../config";
 
-const server = new rpc.Server(
+const server = new Server(
     STELLAR_CONFIG.rpcUrl
 );
 
