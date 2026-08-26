@@ -258,3 +258,60 @@ button {
     padding: 40px 0;
   }
 }
+
+.wallet-section {
+  position: relative;
+}
+
+.connected-wallet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wallet-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.wallet-name {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wallet-address {
+  font-family: monospace;
+  font-size: 13px;
+  color: #667085;
+}
+
+.disconnect-button {
+  border: 1px solid #d9dee7;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: white;
+  color: #17202a;
+}
+
+.disconnect-button:hover {
+  background: #f5f7fb;
+}
+
+.wallet-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.wallet-error {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 250px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff1f1;
+  color: #b42318;
+  font-size: 12px;
+}

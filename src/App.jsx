@@ -1,5 +1,4 @@
 import Navbar from "./components/Navbar";
-import WalletModal from "./components/WalletModal";
 import CampaignCard from "./components/CampaignCrad";
 import DonateForm from "./components/DonateForm";
 import TransactionStatus from "./components/TransactionStatus";
@@ -37,8 +36,6 @@ function App() {
         <TransactionStatus />
 
         <ActivityFeed />
-
-        <WalletModal />
       </main>
     </div>
   );
