@@ -4,8 +4,14 @@ import CampaignCard from "./components/CampaignCrad";
 import DonateForm from "./components/DonateForm";
 import TransactionStatus from "./components/TransactionStatus";
 import ActivityFeed from "./components/ActivityFeed";
+import ContractStats from "./components/ContractStats";
+import { useState } from "react";
+
 
 function App() {
+  const [walletAddress, setWalletAddress] =
+    useState("");
+
   return (
     <div className="app">
       <Navbar />
@@ -39,6 +45,9 @@ function App() {
         <TransactionStatus />
 
         <ActivityFeed />
+        <ContractStats
+          walletAddress={walletAddress}
+        />
       </main>
     </div>
   );

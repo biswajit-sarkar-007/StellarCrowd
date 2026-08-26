@@ -1,34 +1,75 @@
 import {
-    STELLAR_NETWORK_PASSPHRASE,
-    STELLAR_SOROBAN_RPC_URL,
-} from "../config/stellar";
+    Contract,
+    TransactionBuilder,
+    BASE_FEE,
+    rpc,
+} from "@stellar/stellar-sdk";
 
-export const contractService = {
-    rpcUrl: STELLAR_SOROBAN_RPC_URL,
+import { STELLAR_CONFIG } from "../config";
 
-    networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
+const server = new rpc.Server(
+    STELLAR_CONFIG.rpcUrl
+);
 
-    async getGoal() {
-        throw new Error(
-            "Contract getGoal() has not been implemented yet."
+const contract = new Contract(
+    STELLAR_CONFIG.contractId
+);
+
+async function buildSimulation(
+    walletAddress,
+    method
+) {
+    const account =
+        await server.getAccount(walletAddress);
+
+    const transaction =
+        new TransactionBuilder(
+            account,
+            {
+                fee: BASE_FEE,
+                networkPassphrase:
+                    STELLAR_CONFIG.networkPassphrase,
+            }
+        )
+            .addOperation(
+                contract.call(method)
+            )
+            .setTimeout(30)
+            .build();
+
+    return server.simulateTransaction(
+        transaction
+    );
+}
+
+export async function getTotalRaised(
+    walletAddress
+) {
+    const result =
+        await buildSimulation(
+            walletAddress,
+            "get_total_raised"
         );
-    },
 
-    async getTotalRaised() {
-        throw new Error(
-            "Contract getTotalRaised() has not been implemented yet."
-        );
-    },
+    if (result.error) {
+        throw new Error(result.error);
+    }
 
-    async getDonorCount() {
-        throw new Error(
-            "Contract getDonorCount() has not been implemented yet."
-        );
-    },
+    return result.result?.retval;
+}
 
-    async donate() {
-        throw new Error(
-            "Contract donate() has not been implemented yet."
+export async function getDonorCount(
+    walletAddress
+) {
+    const result =
+        await buildSimulation(
+            walletAddress,
+            "get_donor_count"
         );
-    },
-};
+
+    if (result.error) {
+        throw new Error(result.error);
+    }
+
+    return result.result?.retval;
+}
